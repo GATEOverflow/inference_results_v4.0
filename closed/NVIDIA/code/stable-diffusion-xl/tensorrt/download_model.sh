@@ -16,7 +16,7 @@
 source code/common/file_downloads.sh
 
 # Make sure the script is executed inside the container
-if [ -e /work/code/stable-diffusion-xl/tensorrt/download_model.sh ]
+if [ -e code/stable-diffusion-xl/tensorrt/download_model.sh ]
 then
     echo "Inside container, start downloading..."
 else
@@ -25,8 +25,8 @@ else
     exit 1
 fi
 
-MODEL_DIR=/work/build/models
-DATA_DIR=/work/build/data
+MODEL_DIR=build/models
+DATA_DIR=build/data
 
 # Download the fp16 raw weights of MLCommon hosted HF checkpoints
 download_file models SDXL/official_pytorch/fp16 \
@@ -62,11 +62,14 @@ fi
 
 # Run onnx generation script
 python3 -m code.stable-diffusion-xl.tensorrt.create_onnx_model
+test $? -eq 0 || exit $?
 echo "Runing SDXL UNet quantization on 500 calibration captions. The process will take ~30 mins on DGX H100"
 python3 -m code.stable-diffusion-xl.ammo.quantize_sdxl --pretrained-base ${MODEL_DIR}/SDXL/official_pytorch/fp16/stable_diffusion_fp16/checkpoint_pipe/ --batch-size 1 \
-    --calib-size 500 --calib-data /work/code/stable-diffusion-xl/ammo/captions.tsv --percentile 0.4 \
+    --calib-size 500 --calib-data code/stable-diffusion-xl/ammo/captions.tsv --percentile 0.4 \
     --n_steps 20 --latent ${DATA_DIR}/coco/SDXL/latents.pt --alpha 0.9 --quant-level 2.5 \
     --int8-ckpt-path ${MODEL_DIR}/SDXL/ammo_models/unetxl.int8.pt
+test $? -eq 0 || exit $?
 echo "Exporting SDXL fp16-int8 UNet onnx. The process will take ~60 mins on DGX H100"
 python3 -m code.stable-diffusion-xl.ammo.export_onnx --pretrained-base ${MODEL_DIR}/SDXL/official_pytorch/fp16/stable_diffusion_fp16/checkpoint_pipe/ --quantized-ckpt ${MODEL_DIR}/SDXL/ammo_models/unetxl.int8.pt --quant-level 2.5 --onnx-dir ${MODEL_DIR}/SDXL/ammo_models/unetxl.int8
+test $? -eq 0 || exit $?
 echo "SDXL model download and generation complete!"
