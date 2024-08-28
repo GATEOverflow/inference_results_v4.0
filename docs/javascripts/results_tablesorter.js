@@ -12,7 +12,10 @@ $(document).ready(function() {
     }).get();
 
     readAllData().then(function(allData) {
+        //initData(allData);
         //console.log(allData);
+        //console.log(category+division+with_power[0]);
+        reConstructTables(category, division, with_power[0], allData);
         constructChartFromSummary(allData, category, division, with_power[0]);
     }).catch(function(error) {
         console.error(error);
@@ -230,21 +233,13 @@ function constructSummaryTable(data, category, division, with_power) {
         html += `
         <thead>
         <tr>
-        <th class="count-submitter">Submitter</th>
-            <th id="col-llama2-99">LLAMA2-70B-99</th>
-            <th id="col-llama2-99.9">LLAMA2-70B-99.9</th>
-            <th id="col-gptj-99">GPTJ-99</th>
-            <th id="col-gptj-99.9">GPTJ-99.9</th>
-            <th id="col-bert-99">Bert-99</th>
-            <th id="col-bert-99.9">Bert-99.9</th>
-            <th id="col-sdxl">Stable Diffusion</th>
-            <th id="col-dlrm-v2-99">DLRM-v2-99</th>
-            <th id="col-dlrm-v2-99.9">DLRM-v2-99.9</th>
-            <th id="col-retinanet">Retinanet</th>
-            <th id="col-resnet50">ResNet50</th>
-            <th id="col-3d-unet-99">3d-unet-99</th>
-            <th id="col-3d-unet-99.9">3d-unet-99.9</th>
-            <th id="col-rnnt">rnnt</th>
+        <th class="count-submitter">Submitter</th>`
+        for(let model of models_datacenter) {
+            html += `
+                <th id="col-model">${model}</th>
+                `
+        }
+        html += ` 
             <th id="all-models">Total</th>
             </tr>
             </thead>
@@ -254,16 +249,13 @@ function constructSummaryTable(data, category, division, with_power) {
         html += `
         <thead>
         <tr>
-        <th class="count-submitter">Submitter</th>
-            <th id="col-gptj-99">GPTJ-99</th>
-            <th id="col-gptj-99.9">GPTJ-99.9</th>
-            <th id="col-bert-99">Bert-99</th>
-            <th id="col-sdxl">Stable Diffusion</th>
-            <th id="col-retinanet">Retinanet</th>
-            <th id="col-resnet50">ResNet50</th>
-            <th id="col-3d-unet-99">3d-unet-99</th>
-            <th id="col-3d-unet-99.9">3d-unet-99.9</th>
-            <th id="col-rnnt">rnnt</th>
+        <th class="count-submitter">Submitter</th>`
+        for(let model of models_edge) {
+            html += `
+                <th id="col-model">${model}</th>
+                `
+        }
+        html += ` 
             <th id="all-models">Total</th>
             </tr>
             </thead>
@@ -670,63 +662,55 @@ function constructTable(category, division, with_power, availability, data) {
         <th id="col-id" class="headcol col-id">ID</th>
         <th id="col-system" class="headcol col-system">System</th>
         <th id="col-submitter" class="headcol col-submitter">Submitter</th>
-        <th id="col-accelerator" class="headcol col-accelerator">Accelerator</th>
-        <th id="col-llama2-99" colspan="${colspan}">LLAMA2-70B-99</th>
-        <th id="col-llama2-99.9" colspan="${colspan}">LLAMA2-70B-99.9</th>
-        <th id="col-gptj-99" colspan="${colspan}">GPTJ-99</th>
-        <th id="col-gptj-99.9" colspan="${colspan}">GPTJ-99.9</th>
-        <th id="col-bert-99" colspan="${colspan}">Bert-99</th>
-        <th id="col-bert-99.9" colspan="${colspan}">Bert-99.9</th>
-        <th id="col-dlrm-v2-99" colspan="${colspan}">Stable Diffusion</th>
-        <th id="col-dlrm-v2-99" colspan="${colspan}">DLRM-v2-99</th>
-        <th id="col-dlrm-v2-99.9" colspan="${colspan}">DLRM-v2-99.9</th>
-        <th id="col-retinanet" colspan="${colspan}">Retinanet</th>
-        <th id="col-resnet50" colspan="${colspan}">ResNet50</th>
-        <th id="col-3d-unet-99" colspan="${colspan_single}">3d-unet-99</th>
-        <th id="col-3d-unet-99.9" colspan="${colspan_single}">3d-unet-99.9</th>
-        <th id="col-rnnt" colspan="${colspan}">RNNT</th>
+        <th id="col-accelerator" class="headcol col-accelerator">Accelerator</th>`
+        for(let model of models_datacenter) {
+            if(model.includes("3d-unet")) {
+                span=colspan_single;
+            }
+            else{
+                span=colspan;
+            }
+            tableheader += `
+                <th id="col-model" colspan=${span}>${model}</th>`
+        }
+    tableheader += `
     </tr>
     <tr>
         <th class="headcol col-id"></th>
         <th class="headcol col-system"></th>
         <th class="headcol col-submitter"></th>
-        <th class="headcol col-accelerator"></th>
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header_single}
-        ${model_header_single}
-        ${model_header}
+        <th class="headcol col-accelerator"></th>`;
+        for(let model of models_datacenter) {
+            if(model.includes("3d-unet")) {
+                tableheader += `
+                ${model_header_single}
+                    `;
+            }
+            else{
+                tableheader += `
+                ${model_header}
+                    `;
+            }
+        }
+        tableheader += `
         </tr>
         <tr>
         <th class="headcol col-id"></th>
         <th class="headcol col-system"></th>
         <th class="headcol col-submitter"></th>
-        <th class="headcol col-accelerator"></th>
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_single_2}
-        ${model_header_single_2}
-        ${model_header_2}
-
-    `;
+        <th class="headcol col-accelerator"></th>`
+        for(let model of models_datacenter) {
+            if(model.includes("3d-unet")) {
+                tableheader += `
+                ${model_header_single_2}
+                    `;
+            }
+            else{
+                tableheader += `
+                ${model_header_2}
+                    `;
+            }
+        }
     }
     else {
         if (with_power) {
@@ -776,47 +760,53 @@ function constructTable(category, division, with_power, availability, data) {
         <th id="col-id" class="headcol col-id">ID</th>
         <th id="col-system" class="headcol col-system">System</th>
         <th id="col-submitter" class="headcol col-submitter">Submitter</th>
-        <th id="col-accelerator" class="headcol col-accelerator">Accelerator</th>
-        <th id="col-gptj-99" colspan="${colspan}">GPTJ-99</th>
-        <th id="col-gptj-99.9" colspan="${colspan}">GPTJ-99.9</th>
-        <th id="col-bert-99" colspan="${colspan}">Bert-99</th>
-        <th id="col-dlrm-v2-99" colspan="${colspan}">Stable Diffusion</th>
-        <th id="col-retinanet" colspan="${colspan_ms}">Retinanet</th>
-        <th id="col-resnet50" colspan="${colspan_ms}">ResNet50</th>
-        <th id="col-3d-unet-99" colspan="${colspan}">3d-unet-99</th>
-        <th id="col-3d-unet-99.9" colspan="${colspan}">3d-unet-99.9</th>
-        <th id="col-rnnt" colspan="${colspan}">RNNT</th>
+        <th id="col-accelerator" class="headcol col-accelerator">Accelerator</th>`;
+        for(let model of models_edge) {
+            if(model.includes("resnet") || model.includes("retinanet")) {
+                tableheader += `
+                    <th id="col-model" colspan="${colspan_ms}">${model}</th>
+                    `;
+            }
+            else {
+                tableheader += `
+                    <th id="col-model" colspan="${colspan}">${model}</th>
+                    `;
+            }
+        }
+    tableheader += `
     </tr>
     <tr>
         <th class="headcol col-id"></th>
         <th class="headcol col-system"></th>
         <th class="headcol col-submitter"></th>
-        <th class="headcol col-accelerator"></th>
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header}
-        ${model_header_ms}
-        ${model_header_ms}
-        ${model_header}
-        ${model_header}
-        ${model_header}
+        <th class="headcol col-accelerator"></th>`;
+        for(let model of models_edge) {
+            if(model.includes("resnet") || model.includes("retinanet")) {
+                tableheader += `
+                ${model_header_ms}`;
+            }
+            else{
+                tableheader += `
+                ${model_header}`;
+            }
+        }
+        tableheader += `
         </tr>
         <tr>
         <th class="headcol col-id"></th>
         <th class="headcol col-system"></th>
         <th class="headcol col-submitter"></th>
-        <th class="headcol col-accelerator"></th>
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_ms_2}
-        ${model_header_ms_2}
-        ${model_header_2}
-        ${model_header_2}
-        ${model_header_2}
-    `;
+        <th class="headcol col-accelerator"></th>`;
+        for(let model of models_edge) {
+            if(model.includes("resnet") || model.includes("retinanet")) {
+                tableheader += `
+                ${model_header_ms_2}`;
+            }
+            else{
+                tableheader += `
+                ${model_header_2}`;
+            }
+        }
     }
     html += tableheader;
     html += `</tr></thead>`;

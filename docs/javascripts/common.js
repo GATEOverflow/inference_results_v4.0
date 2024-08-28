@@ -5,9 +5,12 @@ var validScenarios = {
     "datacenter": [ "Server", "Offline" ]
 }
 
-models_datacenter = [ "llama2-70b-99", "llama2-70b-99.9", "gptj-99", "gptj-99.9", "bert-99", "bert-99.9",  "stable-diffusion-xl", "dlrm-v2-99", "dlrm-v2-99.9", "retinanet", "resnet", "3d-unet-99", "3d-unet-99.9", "rnnt"];
+models_datacenter_ = [ "llama2-70b-99", "llama2-70b-99.9", "gptj-99", "gptj-99.9", "bert-99", "bert-99.9",  "stable-diffusion-xl", "dlrm-v2-99", "dlrm-v2-99.9", "retinanet", "resnet", "3d-unet-99", "3d-unet-99.9", "rnnt"];
 
-models_edge = [ "gptj-99", "gptj-99.9", "bert-99", "stable-diffusion-xl", "retinanet", "resnet", "3d-unet-99", "3d-unet-99.9", "rnnt"];
+models_edge_ = [ "gptj-99", "gptj-99.9", "bert-99", "stable-diffusion-xl", "retinanet", "resnet", "3d-unet-99", "3d-unet-99.9", "rnnt"];
+
+models_datacenter = [];
+models_edge = [];
 
 const dbName = "mlperf_inference";
 const dbVersion = 4;
@@ -82,6 +85,7 @@ function readAllData() {
                     data.push(cursor.value); // Push each record to the data array
                     cursor.continue(); // Move to the next record
                 } else {
+                    initData(data);
                     resolve(data); // Resolve the promise with the data array when done
                 }
             };
@@ -191,15 +195,21 @@ function initData(data) {
             }
         }
     });
-    console.log(models_datacenter);
-    console.log(models_edge);
+
+    models_datacenter.sort((a, b) => {
+        return models_datacenter_.indexOf(a) - models_datacenter_.indexOf(b);
+    });
+    models_edge.sort((a, b) => {
+        return models_edge_.indexOf(a) - models_edge_.indexOf(b);
+    });
+//    console.log(models_datacenter);
+  //  console.log(models_edge);
 }
 
 
 function filterData(data, keys, values, extra_filter=null) {
     let filtered_data = [];
     if (!data) return filtered_data;
-    //initData(data);
 
     data.forEach(function(item) {
         let mismatch = false;
