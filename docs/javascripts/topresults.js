@@ -224,7 +224,7 @@ $(document).ready(function() {
         var models = getUniqueValues(myData, "Model");
         var devices = getUniqueValuesCombined(myData, " x ", [ "Accelerator", "a#" ]);
         var platforms = getUniqueValuesCombined(myData, " : ", [ "version", "Platform" ]);
-        var scenarios = validScenarios["datacenter"];// getUniqueValues(myData, "Scenario");
+        var scenarios = validScenarios[category];// getUniqueValues(myData, "Scenario");
         platforms.unshift("All systems");
         devices.unshift("All devices");
         buildSelectOption(models, "model", model);
@@ -242,7 +242,7 @@ $(document).ready(function() {
         values = [ category, division, availability, model ];
         //console.log(allData);
         myData = filterData(allData, keys, values);
-        //console.log(scenario);
+        //console.log(category+division+scenario);
         var scenarios = getUniqueValues(myData, "Scenario");
         buildSelectOption(scenarios, "scenario", scenario);
     });
