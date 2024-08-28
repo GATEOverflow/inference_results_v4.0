@@ -12,7 +12,6 @@ $(document).ready(function() {
     }).get();
 
     readAllData().then(function(allData) {
-        //initData(allData);
         //console.log(allData);
         //console.log(category+division+with_power[0]);
         reConstructTables(category, division, with_power[0], allData);

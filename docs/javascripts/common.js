@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function getUniqueValues(data, key) {
     let uniqueValues = [];
     $.each(data, function(index, item) {
-        if (item[key] && uniqueValues.indexOf(item[key]) === -1) {
+        if (item[key]  && item[key].trim() != '' && uniqueValues.indexOf(item[key]) === -1) {
             uniqueValues.push(item[key]);
         }
     });
@@ -184,6 +184,7 @@ function initData(data) {
     models_datacenter = []
     models_edge = []
     data.forEach(function(item) {
+        if(item['Category'] != "closed") return;
         if(item['Suite'].includes("datacenter")) {
             if(!models_datacenter.includes(item['Model'])) {
                 models_datacenter.push(item['Model']);
@@ -194,6 +195,7 @@ function initData(data) {
                 models_edge.push(item['Model']);
             }
         }
+        //if(item['Model'] == "llama2-70b-99"
     });
 
     models_datacenter.sort((a, b) => {
