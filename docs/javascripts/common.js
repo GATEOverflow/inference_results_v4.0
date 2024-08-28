@@ -176,9 +176,30 @@ function getUniqueValuesCombined(data, sep, keys) {
     return uniqueValues;
 }
 
+function initData(data) {
+    models_datacenter = []
+    models_edge = []
+    data.forEach(function(item) {
+        if(item['Suite'].includes("datacenter")) {
+            if(!models_datacenter.includes(item['Model'])) {
+                models_datacenter.push(item['Model']);
+            }
+        }
+        if(item['Suite'].includes("edge")) {
+            if(!models_edge.includes(item['Model'])) {
+                models_edge.push(item['Model']);
+            }
+        }
+    });
+    console.log(models_datacenter);
+    console.log(models_edge);
+}
+
+
 function filterData(data, keys, values, extra_filter=null) {
     let filtered_data = [];
     if (!data) return filtered_data;
+    //initData(data);
 
     data.forEach(function(item) {
         let mismatch = false;
@@ -237,6 +258,7 @@ function filterDataFromValues(data, key, values=[]) {
             filtered_data.push(item);
         }
     });
+    //initData(filtered_data);
     return filtered_data;
 }
 
@@ -254,6 +276,7 @@ function filterDataByAccelerators(data, acc_names, acc_nums) {
             filtered_data.push(item);
         }
     });
+    //initData(filtered_data);
     return filtered_data;
 }
 
@@ -271,6 +294,7 @@ function filterDataBySystems(data, systems, versions) {
             filtered_data.push(item);
         }
     });
+    //initData(filtered_data);
     return filtered_data;
 }
 
