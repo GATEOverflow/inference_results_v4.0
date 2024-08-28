@@ -292,7 +292,12 @@ $(document).ready(function() {
         var models = getUniqueValues(myData, "Model");
 
         additional_metric_column_name = "";
-        perfsortorder = 0;
+        if(scenario == "Offline" || scenario == "Server") {
+            perfsortorder = 1;
+        }
+        else {
+            perfsortorder = 0;
+        }
         charttitlesuffix = ` for ${model} ${scenario} scenario in ${division} division ${category} category`;
         keys = ["Model", "Scenario"];
         values = [model, scenario];
