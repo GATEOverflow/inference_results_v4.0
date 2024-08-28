@@ -1,3 +1,4 @@
+var result_version="v4.0";
 var scenarioUnits = {};
 var accuracyUnits = {};
 var validScenarios = {
@@ -18,7 +19,7 @@ const objStore = "inference_results";
 
 async function fetchAndStoreData(db) {
     try {
-        const data = await $.getJSON("https://raw.githubusercontent.com/GATEOverflow/inference_results_v4.0/main/summary_results.json");
+        const data = await $.getJSON("https://raw.githubusercontent.com/GATEOverflow/inference_results_"+result_version+"/main/summary_results.json");
 
         // Begin a transaction to save data in IndexedDB
         const transaction = db.transaction([objStore], "readwrite");

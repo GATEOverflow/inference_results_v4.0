@@ -115,8 +115,8 @@ $(document).ready(function() {
         */
         readAllData().then(function(allData) {
 //            console.log(allData);
-            sysversion1 = "v4.0";
-            sysversion2 = "v4.0";
+            sysversion1 = result_version;
+            sysversion2 = result_version;
             reConstructTables(system1, sysversion1, system2, sysversion2, selected_models, allData);
         }).catch(function(error) {
             console.error(error);
@@ -137,7 +137,7 @@ function reConstructTables(system1, sysversion1, system2, sysversion2, selected_
     let values = [scenario, system1, sysversion1];
     //console.log(scenario);    
 
-    console.log(selected_models);
+    //console.log(selected_models);
 
     let result1 = filterData(data, keys, values);
     if(!selected_models.includes("All models")) {
