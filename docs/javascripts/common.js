@@ -170,8 +170,11 @@ function getUniqueValuesCombined(data, sep, keys) {
     let uniqueValues = [];
     $.each(data, function(index, item) {
         values = []
-        for(key in keys)
+        for(key in keys) {
+            if(!item[keys[key]] || (item[keys[key]]).toString().trim() == '')
+                return;
             values.push(item[keys[key]]);
+        }
         merged = values.join(sep);
         if (uniqueValues.indexOf(merged) === -1) {
             uniqueValues.push(merged);

@@ -30,6 +30,7 @@ function updateContent(myData) {
     model = $("#model").val();
     scenario = $("#scenario").val();
     division = $("#division").val(); 
+    category = $("#category").val(); 
     metric = $("#metric").val(); 
     //updateScenarioUnits(myData);
     $("#topresults_heading").text(`${model} results in ${category} category, ${division} division`);
