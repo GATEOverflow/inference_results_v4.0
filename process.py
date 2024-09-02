@@ -10,6 +10,7 @@ def getuniquevalues(data, key):
 
 with open('summary_results.json') as f:
     data = json.load(f)
+
 models_all = getuniquevalues(data, "Model")
 models_all.insert(0, "All models")
 platforms = getuniquevalues(data, "Platform")
