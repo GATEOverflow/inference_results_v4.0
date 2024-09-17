@@ -39,6 +39,6 @@ fi
 sleep 0.1
 
 echo "Downloading JSON files describing subset used for inference/calibration..."
-wget https://raw.githubusercontent.com/mlcommons/inference/${INFERENCE_HASH}/vision/medical_imaging/3d-unet-kits19/meta/inference_cases.json -O ${DATA_DIR}/KiTS19/inference_cases.json
-wget https://raw.githubusercontent.com/mlcommons/inference/${INFERENCE_HASH}/vision/medical_imaging/3d-unet-kits19/meta/calibration_cases.json -O ${DATA_DIR}/KiTS19/calibration_cases.json
+wget https://raw.githubusercontent.com/mlcommons/inference/master/vision/medical_imaging/3d-unet-kits19/meta/inference_cases.json -O ${DATA_DIR}/KiTS19/inference_cases.json
+wget https://raw.githubusercontent.com/mlcommons/inference/master/vision/medical_imaging/3d-unet-kits19/meta/calibration_cases.json -O ${DATA_DIR}/KiTS19/calibration_cases.json
 echo "Done."
