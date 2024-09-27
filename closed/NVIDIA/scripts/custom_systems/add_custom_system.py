@@ -20,6 +20,9 @@ import shutil
 import textwrap
 from copy import deepcopy
 from importlib import import_module, reload
+import sys
+import select
+import socket
 
 # We want system_list to be easily reloadable. Import the entire module, instead of directly importing member variables.
 import code.common.systems.system_list
@@ -238,26 +241,40 @@ def generate_configs(system):
                 generate_config(benchmark, scenario, system)
 
 
-def yes_no_prompt(message, default=True):
-    choices = ["", "y", "n"]
+def yes_no_prompt(message, default=True, timeout=10):
+    # Set default choices based on the default parameter
+    choices = ["y", "n"]
     if default is True:
-        choice_str = "[y/n]"
+        choice_str = "[Y/n]"  # Capital Y to indicate default 'yes'
     elif default is False:
-        choice_str = "[y/n]"
+        choice_str = "[y/N]"  # Capital N to indicate default 'no'
     elif default is None:
-        choice_str = "[y/n]"
-        choices = ["y", "n"]
+        choice_str = "[y/n]"  # No default option, must choose
     else:
         raise ValueError(f"Invalid option for default prompt choice: {default}")
 
-    resp = None
-    while resp is None or resp.lower() not in choices:
-        resp = input(f"{message} {choice_str}: ")
+    # Display the prompt message
+    sys.stdout.write(f"{message} {choice_str}: ")
+    sys.stdout.flush()
 
-    if resp == "":
-        return default
+    # Use select to wait for input with a timeout
+    ready, _, _ = select.select([sys.stdin], [], [], timeout)
+
+    if ready:
+        # If input is provided within the timeout, read it
+        resp = sys.stdin.readline().strip().lower()
+        if resp == "":
+            return default  # No input, return the default
+        elif resp in choices:
+            return resp == "y"  # Return True if 'y', False if 'n'
+        else:
+            # Handle invalid inputs by prompting again
+            print("Invalid input. Please enter 'y' or 'n'.")
+            return yes_no_prompt(message, default, timeout)  # Reprompt on invalid input
     else:
-        return resp == "y"
+        # Timeout occurred, return the default value
+        print(f"\nNo input received in {timeout} seconds. Defaulting to {'Yes' if default else 'No'}.")
+        return default
 
 
 def main():
@@ -318,13 +335,34 @@ def main():
         sys_id = DETECTED_SYSTEM.get_id()
 
     while not SYSTEM_NAME_PATTERN.fullmatch(sys_id):
-        sys_id = input("=> Specify the system ID to use for the current system: ")
+        # Get the system's hostname to use as the default
+        hostname = os.environ.get('CM_HW_NAME', get_system_hostname())
+
+        # Prompt the user for input with a 10-second timeout
+        sys.stdout.write(f"=> Specify the system ID to use for the current system [Default: {hostname}]: ")
+        sys.stdout.flush()
+
+        # Wait for user input with a timeout of 10 seconds
+        ready, _, _ = select.select([sys.stdin], [], [], 30)
+
+        if ready:
+            # Read user input if provided within the timeout
+            sys_id = sys.stdin.readline().strip()
+
+            # If input is empty, use the system hostname
+            if sys_id == "":
+                sys_id = hostname
+        else:
+            # Timeout occurred, default to the system hostname
+            print(f"\nNo input received in 30 seconds. Using default system ID: {hostname}")
+            sys_id = hostname
 
         # Check if the chosen name conflicts with an existing name
         if custom_list_module and sys_id in custom_list_module.custom_systems:
             print(f"=> '{sys_id}' is already being used as the system_id for a different custom system")
             print(f"=> Please enter a different name")
             sys_id = ""
+
 
     DETECTED_SYSTEM.set_id(sys_id)
     system_copy = deepcopy(DETECTED_SYSTEM)
