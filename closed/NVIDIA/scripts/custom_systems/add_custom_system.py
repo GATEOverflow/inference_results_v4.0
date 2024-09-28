@@ -276,6 +276,9 @@ def yes_no_prompt(message, default=True, timeout=10):
         print(f"\nNo input received in {timeout} seconds. Defaulting to {'Yes' if default else 'No'}.")
         return default
 
+def get_system_hostname():
+    """Get the system's hostname."""
+    return socket.gethostname()
 
 def main():
     # Inform the user on what this script does.
