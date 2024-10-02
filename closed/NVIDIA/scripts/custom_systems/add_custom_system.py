@@ -253,6 +253,12 @@ def yes_no_prompt(message, default=True, timeout=10):
     else:
         raise ValueError(f"Invalid option for default prompt choice: {default}")
 
+    # Check if running in a non-interactive shell
+    if not sys.stdin.isatty():
+        # In a non-interactive environment, immediately return the default value
+        print(f"\nNon-interactive environment detected. Defaulting to {'Yes' if default else 'No'}.")
+        return default
+
     # Display the prompt message
     sys.stdout.write(f"{message} {choice_str}: ")
     sys.stdout.flush()
