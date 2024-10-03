@@ -343,27 +343,35 @@ def main():
     if DETECTED_SYSTEM.get_id() is not None:
         sys_id = DETECTED_SYSTEM.get_id()
 
+
+    # Main logic for setting sys_id
     while not SYSTEM_NAME_PATTERN.fullmatch(sys_id):
         # Get the system's hostname to use as the default
         hostname = os.environ.get('CM_HW_NAME', get_system_hostname())
 
-        # Prompt the user for input with a 10-second timeout
-        sys.stdout.write(f"=> Specify the system ID to use for the current system [Default: {hostname}]: ")
-        sys.stdout.flush()
+        # Check if the shell is interactive
+        if sys.stdin.isatty():
+            # Interactive shell: Prompt the user for input with a 10-second timeout
+            sys.stdout.write(f"=> Specify the system ID to use for the current system [Default: {hostname}]: ")
+            sys.stdout.flush()
 
-        # Wait for user input with a timeout of 10 seconds
-        ready, _, _ = select.select([sys.stdin], [], [], 30)
+            # Wait for user input with a timeout of 10 seconds
+            ready, _, _ = select.select([sys.stdin], [], [], 30)
 
-        if ready:
-            # Read user input if provided within the timeout
-            sys_id = sys.stdin.readline().strip()
+            if ready:
+                # Read user input if provided within the timeout
+                sys_id = sys.stdin.readline().strip()
 
-            # If input is empty, use the system hostname
-            if sys_id == "":
+                # If input is empty, use the system hostname
+                if sys_id == "":
+                    sys_id = hostname
+            else:
+                # Timeout occurred, default to the system hostname
+                print(f"\nNo input received in 30 seconds. Using default system ID: {hostname}")
                 sys_id = hostname
         else:
-            # Timeout occurred, default to the system hostname
-            print(f"\nNo input received in 30 seconds. Using default system ID: {hostname}")
+            # Non-interactive shell: directly use the default hostname
+            print(f"=> Non-interactive shell detected. Using default system ID: {hostname}")
             sys_id = hostname
 
         # Check if the chosen name conflicts with an existing name
@@ -371,7 +379,6 @@ def main():
             print(f"=> '{sys_id}' is already being used as the system_id for a different custom system")
             print(f"=> Please enter a different name")
             sys_id = ""
-
 
     DETECTED_SYSTEM.set_id(sys_id)
     system_copy = deepcopy(DETECTED_SYSTEM)
