@@ -254,7 +254,7 @@ def yes_no_prompt(message, default=True, timeout=10):
         raise ValueError(f"Invalid option for default prompt choice: {default}")
 
     # Check if running in a non-interactive shell
-    if not sys.stdin.isatty():
+    if os.getenv("CI") == "true" or not sys.stdin.isatty():
         # In a non-interactive environment, immediately return the default value
         print(f"\nNon-interactive environment detected. Defaulting to {'Yes' if default else 'No'}.")
         return default
@@ -354,7 +354,7 @@ def main():
         cm_hw_name = os.environ.get('CM_HW_NAME')
 
         # Check if the shell is interactive
-        if not cm_hw_name and sys.stdin.isatty():
+        if not cm_hw_name and os.getenv("CI") == "false" and sys.stdin.isatty():
             # Interactive shell: Prompt the user for input with a 10-second timeout
             sys.stdout.write(f"=> Specify the system ID to use for the current system [Default: {hostname}]: ")
             sys.stdout.flush()
