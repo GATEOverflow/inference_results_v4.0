@@ -304,7 +304,10 @@ def main():
         s += "\n" + "!" * 80
         print(s)
 
-        resp = yes_no_prompt("Continue?")
+        if os.environ.get("CM_CUSTOM_SYSTEM_NVIDIA", "").lower() in [ "1", "yes", "true" ]:
+            resp = True
+        else:
+            resp = yes_no_prompt("Continue?")
         if not resp:
             print("Exiting.")
             return
