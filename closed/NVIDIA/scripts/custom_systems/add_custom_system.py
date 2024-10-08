@@ -347,10 +347,11 @@ def main():
     # Main logic for setting sys_id
     while not SYSTEM_NAME_PATTERN.fullmatch(sys_id):
         # Get the system's hostname to use as the default
-        hostname = os.environ.get('CM_HW_NAME', get_system_hostname())
+        hostname = get_system_hostname()
+        cm_hw_name = os.environ.get('CM_HW_NAME')
 
         # Check if the shell is interactive
-        if sys.stdin.isatty():
+        if sys.stdin.isatty() and not cm_hw_name:
             # Interactive shell: Prompt the user for input with a 10-second timeout
             sys.stdout.write(f"=> Specify the system ID to use for the current system [Default: {hostname}]: ")
             sys.stdout.flush()
@@ -370,9 +371,9 @@ def main():
                 print(f"\nNo input received in 30 seconds. Using default system ID: {hostname}")
                 sys_id = hostname
         else:
-            # Non-interactive shell: directly use the default hostname
+            # Non-interactive shell or name given: directly use the default hostname
             print(f"=> Non-interactive shell detected. Using default system ID: {hostname}")
-            sys_id = hostname
+            sys_id = os.environ.get('CM_HW_NAME', get_system_hostname())
 
         # Check if the chosen name conflicts with an existing name
         if custom_list_module and sys_id in custom_list_module.custom_systems:
