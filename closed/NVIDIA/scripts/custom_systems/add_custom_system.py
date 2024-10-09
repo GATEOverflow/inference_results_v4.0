@@ -378,7 +378,7 @@ def main():
         else:
             # Non-interactive shell or name given: directly use the default hostname
             print(f"=> Non-interactive shell detected or name defined. Using default system ID: {hostname}")
-            sys_id = os.environ.get('CM_NVIDIA_SYSTEM_NAME', os.environ.get(CM_HW_NAME', get_system_hostname()))
+            sys_id = os.environ.get('CM_NVIDIA_SYSTEM_NAME', os.environ.get('CM_HW_NAME', get_system_hostname()))
             sys_name_assigned = True
 
         if sys_name_assigned:                                                                
