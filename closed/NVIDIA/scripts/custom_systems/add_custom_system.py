@@ -354,7 +354,7 @@ def main():
         cm_hw_name = os.environ.get('CM_HW_NAME')
 
         # Check if the shell is interactive
-        if not cm_hw_name and os.getenv("CI") == "false" and sys.stdin.isatty():
+        if not cm_hw_name and os.getenv("CI") != "true" and sys.stdin.isatty():
             # Interactive shell: Prompt the user for input with a 10-second timeout
             sys.stdout.write(f"=> Specify the system ID to use for the current system [Default: {hostname}]: ")
             sys.stdout.flush()
