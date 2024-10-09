@@ -352,6 +352,7 @@ def main():
         # Get the system's hostname to use as the default
         hostname = get_system_hostname()
         cm_sys_name = os.environ.get('CM_NVIDIA_SYSTEM_NAME')
+        sys_name_assigned = False
 
         # Check if the shell is interactive
         if not cm_sys_name and os.getenv("CI") != "true" and sys.stdin.isatty():
@@ -373,16 +374,19 @@ def main():
                 # Timeout occurred, default to the system hostname
                 print(f"\nNo input received in 30 seconds. Using default system ID: {hostname}")
                 sys_id = hostname
+                sys_name_assigned = True
         else:
             # Non-interactive shell or name given: directly use the default hostname
             print(f"=> Non-interactive shell detected or name defined. Using default system ID: {hostname}")
             sys_id = os.environ.get('CM_NVIDIA_SYSTEM_NAME', os.environ.get(CM_HW_NAME', get_system_hostname()))
+            sys_name_assigned = True
+
+        if sys_name_assigned:                                                                
             if not SYSTEM_NAME_PATTERN.fullmatch(sys_id):
                 sys_id = f"Nvidia_{sys_id}"
             if not SYSTEM_NAME_PATTERN.fullmatch(sys_id):
                 print(f"The given name {sys_id} is not suitable. Using 'Nvidia_test_system' as sys_id")
                 sys_id = "Nvidia_test_system"
-
             break
 
         # Check if the chosen name conflicts with an existing name
