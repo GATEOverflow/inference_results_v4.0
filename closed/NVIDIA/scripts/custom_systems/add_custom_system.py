@@ -351,10 +351,10 @@ def main():
     while not SYSTEM_NAME_PATTERN.fullmatch(sys_id):
         # Get the system's hostname to use as the default
         hostname = get_system_hostname()
-        cm_hw_name = os.environ.get('CM_HW_NAME')
+        cm_sys_name = os.environ.get('CM_NVIDIA_SYSTEM_NAME')
 
         # Check if the shell is interactive
-        if not cm_hw_name and os.getenv("CI") != "true" and sys.stdin.isatty():
+        if not cm_sys_name and os.getenv("CI") != "true" and sys.stdin.isatty():
             # Interactive shell: Prompt the user for input with a 10-second timeout
             sys.stdout.write(f"=> Specify the system ID to use for the current system [Default: {hostname}]: ")
             sys.stdout.flush()
@@ -375,8 +375,15 @@ def main():
                 sys_id = hostname
         else:
             # Non-interactive shell or name given: directly use the default hostname
-            print(f"=> Non-interactive shell detected. Using default system ID: {hostname}")
-            sys_id = os.environ.get('CM_HW_NAME', get_system_hostname())
+            print(f"=> Non-interactive shell detected or name defined. Using default system ID: {hostname}")
+            sys_id = os.environ.get('CM_NVIDIA_SYSTEM_NAME', os.environ.get(CM_HW_NAME', get_system_hostname()))
+            if not SYSTEM_NAME_PATTERN.fullmatch(sys_id):
+                sys_id = f"Nvidia_{sys_id}"
+            if not SYSTEM_NAME_PATTERN.fullmatch(sys_id):
+                print(f"The given name {sys_id} is not suitable. Using 'Nvidia_test_system' as sys_id")
+                sys_id = "Nvidia_test_system"
+
+            break
 
         # Check if the chosen name conflicts with an existing name
         if custom_list_module and sys_id in custom_list_module.custom_systems:
